@@ -1,0 +1,89 @@
+//
+// Copyright (c) 2017
+// Cavium
+// Mainflux
+// IOTech
+// Copyright (c) 2018 Dell Technologies, Inc.
+// Copyright (c) 2019 Intel Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package internal
+
+// TODO:
+// - Event buffer management per sender(do not block distro.Loop on full
+//   registration channel)
+
+import (
+	"fmt"
+	"net/http"
+)
+
+const (
+	TimerTick_5s           =  5
+	TimerTick_10s          =  10
+	TimerTick_30s          =  30
+)
+
+
+func StartHTTPServer(errChan chan error) {
+	go func() {
+		p := fmt.Sprintf(":%d", 27000)
+		NsplusSdk.LoggingClient.Info(fmt.Sprintf("Starting %s %s", AppNameKey, p))
+
+		err := http.ListenAndServe(p, httpServer())
+		if err != nil {
+			NsplusSdk.LoggingClient.Error(fmt.Sprintf("ListenAndServe with error: %s", err.Error()))
+			errChan <- err
+
+			ExitService(err)
+			return
+		}
+	}()
+}
+
+// Loop - registration loop
+func Loop(errChan chan error) {
+	go func() {
+		p := fmt.Sprintf(":%d", 27000)
+		NsplusSdk.LoggingClient.Info(fmt.Sprintf("Starting %s %s", AppNameKey, p))
+
+		err := http.ListenAndServe(p, httpServer())
+		if err != nil {
+			NsplusSdk.LoggingClient.Error(fmt.Sprintf("ListenAndServe with error: %s", err.Error()))
+			errChan <- err
+
+			ExitService(err)
+			return
+		}
+	}()
+
+	NsplusSdk.LoggingClient.Info("Starting ZMQClients loop for revc data")
+	for {
+		select {
+		case e := <-NsplusSdk.MessageErrors:
+			NsplusSdk.LoggingClient.Error(fmt.Sprintf("Get Error msg: %s", e.Error()))
+			//return
+		case msgEnvelope := <-NsplusSdk.MessageEnvelopes:
+			NsplusSdk.LoggingClient.Info("Event received on message queue. %v ",  string(msgEnvelope.Payload))
+
+			RecvData, err := NsplusSdk.RecvData(msgEnvelope)
+			if err != nil{
+				NsplusSdk.LoggingClient.Error(fmt.Sprintf("received on message queue fail from zmq[%s] ", msgEnvelope.CorrelationID))
+				continue
+			}
+
+			NsplusSdk.LoggingClient.Info(fmt.Sprintf("Receive data [%v] ", RecvData))
+			if RecvData == nil{
+				NsplusSdk.LoggingClient.Error(fmt.Sprintf("received nil data for uuid[%s] ", NsplusSdk.Profile.Uuid))
+				continue
+			}
+			/********** ==== 按需求添加数据输出流程 ====**********/
+
+		}
+	}
+}
+
+
+

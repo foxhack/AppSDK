@@ -1,0 +1,35 @@
+{
+	"appbase": {
+		"baseappname": "nsdemo",
+		"baseappversion": "v1.0.0",
+		"sdk": "EDGEAPP_SDK_C",
+		"type": "10"
+	},
+	"basedescription": {
+		"namechs": "app-nspdemo",
+		"description": "",
+		"manufactureName": "NARI",
+		"note": "App[nsdemo.v1.0.0] for "
+	},
+	"baseimageid": "docker-guarder-go:2.0.0-dev",
+	"filename": "nsdemo.tar.gz",
+	"size": "",
+	"datetime": "2020-02-28 11:37:30",
+	"ctrlflag": {
+		"multienable": true,
+		"runonce": false
+	},
+	"config": {
+		"profileName": "nsdemo.profile",
+		"cpu": {
+			"cpus": 1,
+			"cpuLmt": 90
+		},
+		"mem": {
+			"memory": 200,
+			"memLmt": 90
+		},
+		"port": 0,
+		"mount": null
+	}
+}
