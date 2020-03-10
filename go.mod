@@ -75,3 +75,5 @@ replace (
 	google.golang.org/grpc v1.15.0 => github.com/grpc/grpc-go v1.15.0
 	gopkg.in/mgo.v2 v2.0.0 => gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
 )
+
+go 1.13
